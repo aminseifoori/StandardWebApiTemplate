@@ -1,5 +1,7 @@
 ﻿using Interfaces;
 using LoggerService;
+using Microsoft.EntityFrameworkCore;
+using Repository;
 
 namespace StandardWebApiTemplate.Extensions
 {
@@ -24,6 +26,14 @@ namespace StandardWebApiTemplate.Extensions
         public static void ConfigureLoggerManager(this IServiceCollection services)
         {
             services.AddSingleton<ILoggerManager, LoggerManager>();
+        }
+
+        public static void ConfigureSQLContext(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddDbContext<RepositoryContext>(options =>
+            {
+                options.UseSqlServer(configuration.GetConnectionString("default"));
+            });
         }
 
     }
