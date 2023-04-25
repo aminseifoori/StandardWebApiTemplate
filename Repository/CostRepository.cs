@@ -13,5 +13,16 @@ namespace Repository
         public CostRepository(RepositoryContext _repositoryContext) : base(_repositoryContext)
         {
         }
+
+        public Cost GetCost(Guid movieId, Guid id, bool trackChanges)
+        {
+            var cost = FindByCondition(m => m.MovieId.Equals(movieId) &&  m.Id.Equals(id), trackChanges).SingleOrDefault();
+            return cost;
+        }
+
+        public IEnumerable<Cost> GetCosts(Guid id, bool trackChanges)
+        {
+            return FindByCondition(m => m.MovieId.Equals(id), trackChanges).OrderBy(o=> o.Amount).ToList();
+        }
     }
 }

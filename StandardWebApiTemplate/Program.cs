@@ -1,3 +1,4 @@
+using Interfaces;
 using NLog;
 using StandardWebApiTemplate.Extensions;
 
@@ -12,13 +13,23 @@ builder.Services.ConfigureLoggerManager();
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureSQLContext(builder.Configuration);
+builder.Services.AddControllers(config =>
+    {
+        config.RespectBrowserAcceptHeader = true; //To accespt other output we need to add this settings
+        config.ReturnHttpNotAcceptable = true; //To restirict the output to acceptable trpe
+    })
+    .AddXmlDataContractSerializerFormatters() //To accept xml output
+    .AddApplicationPart(typeof(StandardWebApiTemplate.Presentation.AssemblyRefrence).Assembly); //to add controller from another project
+builder.Services.AddAutoMapper(typeof(Program));
+
 
 
 var app = builder.Build();
 
-if(app.Environment.IsDevelopment())
-    app.UseDeveloperExceptionPage();
-else
+var logger = app.Services.GetRequiredService<ILoggerManager>();
+app.ConfigureExceptionHandler(logger);
+
+if(app.Environment.IsProduction())
     app.UseHsts();
 
 // Configure the HTTP request pipeline.

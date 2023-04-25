@@ -8,10 +8,25 @@ using System.Threading.Tasks;
 
 namespace Repository
 {
-    public class MovieRepository : RepositoryBase<Movie>, IMovieRepository
+    internal sealed class MovieRepository : RepositoryBase<Movie>, IMovieRepository
     {
         public MovieRepository(RepositoryContext _repositoryContext) : base(_repositoryContext)
         {
+        }
+
+        public void CreateMovie(Movie movie)
+        {
+            Create(movie);
+        }
+
+        public IEnumerable<Movie> GetAllMovies(bool trackChanges)
+        {
+            return FindAll(trackChanges).OrderBy(m=> m.Name).ToList();
+        }
+
+        public Movie GetMovie(Guid id, bool trachChanges)
+        {
+            return FindByCondition(x => x.Id.Equals(id), trachChanges).SingleOrDefault();
         }
     }
 }

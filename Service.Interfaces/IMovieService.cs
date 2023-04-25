@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Shared.Dtos.Movies;
 
 namespace Service.Interfaces
 {
     public interface IMovieService
     {
+        IEnumerable<MovieDto> GetAllMovies(bool trackChanges);
+        MovieDto GetMovieById(Guid id, bool trackChanges);
+        MovieDto CreateMovie(CreateMovieDto company);
     }
 }

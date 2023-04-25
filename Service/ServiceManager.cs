@@ -1,4 +1,5 @@
-﻿using Interfaces;
+﻿using AutoMapper;
+using Interfaces;
 using Service.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -14,11 +15,12 @@ namespace Service
         private readonly Lazy<IMovieService> movieService;
         private readonly Lazy<ICostService> costService;
 
-        public ServiceManager(IRepositoryManager _repositoryManager, ILoggerManager _loggerManager)
+        public ServiceManager(IRepositoryManager _repositoryManager, ILoggerManager _loggerManager, IMapper _mapper)
         {
 
-            movieService = new Lazy<IMovieService>(() => new MovieService(_repositoryManager, _loggerManager));
-            costService = new Lazy<ICostService>(() => new CostService(_repositoryManager, _loggerManager));
+            movieService = new Lazy<IMovieService>(() => new MovieService(_repositoryManager, _loggerManager, _mapper));
+            costService = new Lazy<ICostService>(() => new CostService(_repositoryManager, _loggerManager, _mapper));
+
         }
         public IMovieService MovieService => movieService.Value;
 

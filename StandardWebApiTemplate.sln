@@ -13,9 +13,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoggerService", "LoggerServ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\Repository.csproj", "{C5D5AB0C-2CAC-48F4-86D6-39C7758D12BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Interfaces", "Service.Interfaces\Service.Interfaces.csproj", "{8A736CFD-94CF-4DAF-B80C-1B2F51374ED4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service.Interfaces", "Service.Interfaces\Service.Interfaces.csproj", "{8A736CFD-94CF-4DAF-B80C-1B2F51374ED4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{3FE519EF-7DBE-4161-970C-9C811657C2BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service", "Service\Service.csproj", "{3FE519EF-7DBE-4161-970C-9C811657C2BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandardWebApiTemplate.Presentation", "StandardWebApiTemplate.Presentation\StandardWebApiTemplate.Presentation.csproj", "{4D387418-DB40-4ECB-AD3A-D311DF938763}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{06782C17-3574-48F6-84B0-6239EF88AEE4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +55,14 @@ Global
 		{3FE519EF-7DBE-4161-970C-9C811657C2BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FE519EF-7DBE-4161-970C-9C811657C2BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FE519EF-7DBE-4161-970C-9C811657C2BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D387418-DB40-4ECB-AD3A-D311DF938763}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D387418-DB40-4ECB-AD3A-D311DF938763}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D387418-DB40-4ECB-AD3A-D311DF938763}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D387418-DB40-4ECB-AD3A-D311DF938763}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06782C17-3574-48F6-84B0-6239EF88AEE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06782C17-3574-48F6-84B0-6239EF88AEE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06782C17-3574-48F6-84B0-6239EF88AEE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06782C17-3574-48F6-84B0-6239EF88AEE4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
