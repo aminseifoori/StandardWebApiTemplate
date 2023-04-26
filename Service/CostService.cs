@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Exceptions;
+using Domain.Models;
 using Interfaces;
 using Service.Interfaces;
 using Shared.Dtos.Costs;
@@ -24,9 +25,22 @@ namespace Service
             mapper = _mapper;
         }
 
+        public CostDto CreateCost(Guid movieId, CreateCostDto createCostDto, bool trackChanges)
+        {
+            var movie = repositoryManager.Movie.GetMovie(movieId, trackChanges) ?? throw new MovieNotFoundException(movieId);
+            var cost = mapper.Map<Cost>(createCostDto);
+
+            repositoryManager.Cost.CreateCostForMovie(movieId, cost);
+            repositoryManager.Save();
+
+            var costDto = mapper.Map<CostDto>(cost);
+
+            return costDto;
+        }
+
         public CostDto GetCost(Guid movieId, Guid id, bool trackChanges)
         {
-            var movie = repositoryManager.Movie.GetMovie(movieId, trackChanges) ?? throw new MovieNotFoundException(id);
+            var movie = repositoryManager.Movie.GetMovie(movieId, trackChanges) ?? throw new MovieNotFoundException(movieId);
 
             var cost = repositoryManager.Cost.GetCost(movieId, id, trackChanges) ?? throw new CostNotFoundException(id);
             

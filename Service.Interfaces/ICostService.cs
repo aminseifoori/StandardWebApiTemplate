@@ -11,5 +11,7 @@ namespace Service.Interfaces
     {
         IEnumerable<CostDto> GetCosts(Guid id, bool trackChanges);
         CostDto GetCost(Guid movieId, Guid id, bool trachChanges);
+        CostDto CreateCost(Guid movieId, CreateCostDto createCostDto, bool trackChanges);
+
     }
 }

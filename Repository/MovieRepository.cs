@@ -28,5 +28,10 @@ namespace Repository
         {
             return FindByCondition(x => x.Id.Equals(id), trachChanges).SingleOrDefault();
         }
+
+        public IEnumerable<Movie> GetMovieByIds(IEnumerable<Guid> ids, bool trackChanges)
+        {
+            return FindByCondition(x=> ids.Contains(x.Id), trackChanges).ToList();
+        }
     }
 }

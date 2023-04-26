@@ -14,6 +14,12 @@ namespace Repository
         {
         }
 
+        public void CreateCostForMovie(Guid movieId, Cost cost)
+        {
+            cost.MovieId = movieId;
+            Create(cost);
+        }
+
         public Cost GetCost(Guid movieId, Guid id, bool trackChanges)
         {
             var cost = FindByCondition(m => m.MovieId.Equals(movieId) &&  m.Id.Equals(id), trackChanges).SingleOrDefault();

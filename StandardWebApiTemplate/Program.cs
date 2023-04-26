@@ -1,4 +1,5 @@
 using Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using NLog;
 using StandardWebApiTemplate.Extensions;
 
@@ -20,6 +21,10 @@ builder.Services.AddControllers(config =>
     })
     .AddXmlDataContractSerializerFormatters() //To accept xml output
     .AddApplicationPart(typeof(StandardWebApiTemplate.Presentation.AssemblyRefrence).Assembly); //to add controller from another project
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true; //This setting suppress the default model state validation that is implemented due to the existence of the [ApiController] attribute in all API controllers
+});
 builder.Services.AddAutoMapper(typeof(Program));
 
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
+using Shared.Dtos.Costs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,11 +27,24 @@ namespace StandardWebApiTemplate.Presentation.Controllers
             return Ok(costs);
         }
 
-        [HttpGet("{id:guid}")]
+        [HttpGet("{id:guid}", Name = "GetCostForMovie")]
         public IActionResult GetCostForMovie(Guid movieId, Guid id)
         {
             var cost = service.CostService.GetCost(movieId, id, false);
             return Ok(cost);
+        }
+
+        [HttpPost]
+        public IActionResult CreateCostForMovie(Guid movieId, [FromBody]CreateCostDto costDto)
+        {
+            if (costDto == null)
+            {
+                return BadRequest("The object is null");
+            }
+
+            var createdCost = service.CostService.CreateCost(movieId, costDto, false);
+
+            return CreatedAtRoute("GetCostForMovie", new {movieId, id = createdCost.Id}, createdCost);
         }
     }
 }

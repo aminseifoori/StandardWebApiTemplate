@@ -44,5 +44,45 @@ namespace Service
             }
             return mapper.Map<MovieDto>(movie);
         }
+
+        public IEnumerable<MovieDto> GetMoviesByIds(IEnumerable<Guid> ids, bool trackChanges)
+        {
+            if(ids is null)
+            {
+                throw new IdParametersBadRequestException();
+            }
+
+            var movies = repositoryManager.Movie.GetMovieByIds(ids, trackChanges);
+
+            if(movies.Count() != ids.Count())
+            {
+                throw new CollectionByIdsBadErquestException();
+            }
+
+            var moviesDto = mapper.Map<IEnumerable<MovieDto>>(movies);
+
+            return moviesDto;
+        }
+
+        public (IEnumerable<MovieDto> movies, string ids) CreateMovieCollection(IEnumerable<CreateMovieDto> createMovieCollection)
+        {
+            if (createMovieCollection is null)
+            {
+                throw new MovieCollectionBadRequest();
+            }
+
+            var movieCollection = mapper.Map<IEnumerable<Movie>>(createMovieCollection);
+            foreach (var movie in movieCollection)
+            {
+                repositoryManager.Movie.CreateMovie(movie);
+            }
+            repositoryManager.Save();
+
+            var moviesReturn = mapper.Map<IEnumerable<MovieDto>>(movieCollection);
+
+            var idsReturn = String.Join(",", moviesReturn.Select(x => x.Id));
+
+            return (movies: moviesReturn, ids: idsReturn);
+        }
     }
 }

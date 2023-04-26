@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shared.Dtos.Costs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +11,6 @@ namespace Shared.Dtos.Movies
     {
         public string? Name { get; set; }
         public string? Description { get; set; }
+        public IEnumerable<CreateCostDto>? Costs { get; set; }
     }
 }
