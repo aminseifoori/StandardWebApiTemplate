@@ -25,6 +25,11 @@ namespace StandardWebApiTemplate.Extensions
             });
         }
 
+        public static void ConfigureIISIntegration(this IServiceCollection services) =>
+            services.Configure<IISOptions>(options =>
+            {
+            });
+
         public static void ConfigureLoggerManager(this IServiceCollection services)
         {
             services.AddSingleton<ILoggerManager, LoggerManager>();

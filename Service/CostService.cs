@@ -38,6 +38,16 @@ namespace Service
             return costDto;
         }
 
+        public void DeleteCost(Guid movieId, Guid id, bool trackChanges)
+        {
+            var movie = repositoryManager.Movie.GetMovie(movieId, trackChanges) ?? throw new MovieNotFoundException(movieId);
+
+            var cost = repositoryManager.Cost.GetCost(movieId, id, trackChanges) ?? throw new CostNotFoundException(id);
+
+            repositoryManager.Cost.DeleteCost(cost);
+            repositoryManager.Save();
+        }
+
         public CostDto GetCost(Guid movieId, Guid id, bool trackChanges)
         {
             var movie = repositoryManager.Movie.GetMovie(movieId, trackChanges) ?? throw new MovieNotFoundException(movieId);
@@ -56,6 +66,16 @@ namespace Service
             var costs = repositoryManager.Cost.GetCosts(movie.Id, trackChanges);
 
             return mapper.Map<IEnumerable<CostDto>>(costs);
+        }
+
+        public void UpdateCost(Guid movieId, Guid id, UpdateCostDto updateCostDto, bool movieTrackChanges, bool costTrackChanges)
+        {
+            var movie = repositoryManager.Movie.GetMovie(movieId, movieTrackChanges) ?? throw new MovieNotFoundException(movieId);
+
+            var cost = repositoryManager.Cost.GetCost(movieId, id, costTrackChanges) ?? throw new CostNotFoundException(id);
+
+            mapper.Map(updateCostDto, cost);
+            repositoryManager.Save();
         }
     }
 }

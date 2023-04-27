@@ -19,6 +19,11 @@ namespace Repository
             Create(movie);
         }
 
+        public void DeleteMovie(Movie movie)
+        {
+            Delete(movie);
+        }
+
         public IEnumerable<Movie> GetAllMovies(bool trackChanges)
         {
             return FindAll(trackChanges).OrderBy(m=> m.Name).ToList();

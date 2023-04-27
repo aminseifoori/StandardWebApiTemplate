@@ -13,6 +13,8 @@ namespace StandardWebApiTemplate
             CreateMap<Cost, CostDto>().ReverseMap();
             CreateMap<Movie, CreateMovieDto>().ReverseMap();
             CreateMap<Cost, CreateCostDto>().ReverseMap();
+            CreateMap<Cost, UpdateCostDto>().ReverseMap();
+            CreateMap<Movie, UpdateMovieDto>().ReverseMap();
         }
 
     }

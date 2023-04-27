@@ -13,5 +13,6 @@ namespace Interfaces
         Movie GetMovie(Guid id, bool trachChanges);
         void CreateMovie(Movie movie);
         IEnumerable<Movie> GetMovieByIds(IEnumerable<Guid> ids, bool trackChanges);
+        void DeleteMovie(Movie movie);
     }
 }

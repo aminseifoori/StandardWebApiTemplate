@@ -9,5 +9,7 @@ namespace Service.Interfaces
         MovieDto CreateMovie(CreateMovieDto company);
         IEnumerable<MovieDto> GetMoviesByIds(IEnumerable<Guid> ids, bool trackChanges);
         (IEnumerable<MovieDto> movies, string ids) CreateMovieCollection(IEnumerable<CreateMovieDto> createMovieCollection);
+        void DeleteMovie(Guid id, bool trackChanges);
+        void UpdateMovie(Guid id, UpdateMovieDto updateMovie, bool trackChanges);
     }
 }

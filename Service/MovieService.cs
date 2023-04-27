@@ -37,11 +37,7 @@ namespace Service
 
         public MovieDto GetMovieById(Guid id, bool trackChanges)
         {
-            var movie = repositoryManager.Movie.GetMovie(id, trackChanges);
-            if(movie is  null)
-            {
-                throw new MovieNotFoundException(id);
-            }
+            var movie = repositoryManager.Movie.GetMovie(id, trackChanges) ?? throw new MovieNotFoundException(id);
             return mapper.Map<MovieDto>(movie);
         }
 
@@ -83,6 +79,21 @@ namespace Service
             var idsReturn = String.Join(",", moviesReturn.Select(x => x.Id));
 
             return (movies: moviesReturn, ids: idsReturn);
+        }
+
+        public void DeleteMovie(Guid id, bool trackChanges)
+        {
+            var movie = repositoryManager.Movie.GetMovie(id, trackChanges) ?? throw new MovieNotFoundException(id);
+            repositoryManager.Movie.DeleteMovie(movie);
+            repositoryManager.Save();
+        }
+
+        public void UpdateMovie(Guid id, UpdateMovieDto updateMovie, bool trackChanges)
+        {
+            var movie = repositoryManager.Movie.GetMovie(id, trackChanges) ?? throw new MovieNotFoundException(id);
+
+            mapper.Map(updateMovie, movie);
+            repositoryManager.Save();
         }
     }
 }

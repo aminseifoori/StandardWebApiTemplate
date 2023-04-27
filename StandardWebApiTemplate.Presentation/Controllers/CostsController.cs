@@ -42,9 +42,37 @@ namespace StandardWebApiTemplate.Presentation.Controllers
                 return BadRequest("The object is null");
             }
 
+            if (!ModelState.IsValid)
+            {
+                return UnprocessableEntity(ModelState);
+            }
+
             var createdCost = service.CostService.CreateCost(movieId, costDto, false);
 
             return CreatedAtRoute("GetCostForMovie", new {movieId, id = createdCost.Id}, createdCost);
+        }
+        [HttpDelete("{id:guid}")]
+        public IActionResult DeleteCost(Guid movieId, Guid id)
+        {
+            service.CostService.DeleteCost(movieId, id, false);
+            return NoContent();
+        }
+
+        [HttpPut("{id:guid}")]
+        public IActionResult UpdateCost(Guid movieId, Guid id, [FromBody]UpdateCostDto updateCostDto) 
+        { 
+            if (updateCostDto == null)
+            {
+                return BadRequest("The object is null");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return UnprocessableEntity(ModelState);
+            }
+
+            service.CostService.UpdateCost(movieId, id, updateCostDto, false, true);
+            return NoContent();
         }
     }
 }

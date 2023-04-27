@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 using Shared.Dtos.Movies;
+using StandardWebApiTemplate.Presentation.ModelBinders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,13 +40,19 @@ namespace StandardWebApiTemplate.Presentation.Controllers
             {
                 return BadRequest("The object is null");
             }
+
+            if (!ModelState.IsValid)
+            {
+                return UnprocessableEntity(ModelState);
+            }
+
             var createdMovie = service.MovieService.CreateMovie(createMovieDto);
 
             return CreatedAtRoute("MovieById", new { id = createdMovie.Id }, createdMovie);
         }
 
         [HttpGet("collection/{ids}", Name = "MovieCollection")]
-        public IActionResult GetMovieCollection(IEnumerable<Guid> ids)
+        public IActionResult GetMovieCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]IEnumerable<Guid> ids)
         {
             var movies= service.MovieService.GetMoviesByIds(ids, false);
             return Ok(movies);
@@ -57,6 +64,30 @@ namespace StandardWebApiTemplate.Presentation.Controllers
             var result = service.MovieService.CreateMovieCollection(createMovieCollectionDto);
 
             return CreatedAtRoute("MovieCollection", new { result.ids }, result.movies);
+        }
+
+        [HttpDelete("{id:guid}")]
+        public IActionResult DeleteMovie(Guid id)
+        {
+            service.MovieService.DeleteMovie(id, false);
+            return NoContent();
+        }
+
+        [HttpPut("{id:guid}")]
+        public IActionResult UpdateMovie(Guid id, [FromBody]UpdateMovieDto updateMovie)
+        {
+            if(updateMovie == null)
+            {
+                return BadRequest("The object is null");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return UnprocessableEntity(ModelState);
+            }
+
+            service.MovieService.UpdateMovie(id, updateMovie, true);
+            return NoContent();
         }
     }
 }

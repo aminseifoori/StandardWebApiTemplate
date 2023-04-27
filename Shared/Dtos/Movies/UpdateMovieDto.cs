@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Dtos.Movies
 {
-    public record CreateMovieDto : MovieManipulationDto
+    public record UpdateMovieDto : MovieManipulationDto
     {
     }
 }

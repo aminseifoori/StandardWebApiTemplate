@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Dtos.Costs
 {
-    public record CreateCostDto : CostManipulationDto
+    public record UpdateCostDto : CostManipulationDto
     {
     }
 }

@@ -12,5 +12,6 @@ namespace Interfaces
         IEnumerable<Cost> GetCosts(Guid id, bool trackChanges);
         Cost GetCost(Guid movieId, Guid id, bool trackChanges);
         void CreateCostForMovie(Guid movieId, Cost cost);
+        void DeleteCost(Cost cost);
     }
 }
