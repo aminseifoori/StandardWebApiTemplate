@@ -10,6 +10,6 @@ namespace Interfaces
     {
         IMovieRepository Movie { get; }
         ICostRepository Cost { get; }
-        void Save();
+        Task SaveAsync();
     }
 }

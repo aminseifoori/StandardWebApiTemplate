@@ -1,5 +1,7 @@
 ﻿using Domain.Models;
 using Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Shared.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,15 +27,19 @@ namespace Repository
             Delete(cost);
         }
 
-        public Cost GetCost(Guid movieId, Guid id, bool trackChanges)
+        public async Task<Cost> GetCostAsync(Guid movieId, Guid id, bool trackChanges)
         {
-            var cost = FindByCondition(m => m.MovieId.Equals(movieId) &&  m.Id.Equals(id), trackChanges).SingleOrDefault();
+            var cost = await FindByCondition(m => m.MovieId.Equals(movieId) &&  m.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
             return cost;
         }
 
-        public IEnumerable<Cost> GetCosts(Guid id, bool trackChanges)
+        public async Task<IEnumerable<Cost>> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges)
         {
-            return FindByCondition(m => m.MovieId.Equals(id), trackChanges).OrderBy(o=> o.Amount).ToList();
+            return await FindByCondition(m => m.MovieId.Equals(id), trackChanges)
+                .OrderBy(o=> o.Amount)
+                .Skip((costParameters.PageNumber - 1) * costParameters.PageSize)
+                .Take(costParameters.PageSize)
+                .ToListAsync();
         }
     }
 }

@@ -9,10 +9,10 @@ namespace Interfaces
 {
     public interface IMovieRepository
     {
-        IEnumerable<Movie> GetAllMovies(bool trackChanges);
-        Movie GetMovie(Guid id, bool trachChanges);
+        Task<IEnumerable<Movie>> GetAllMoviesAsync(bool trackChanges);
+        Task<Movie> GetMovieAsync(Guid id, bool trachChanges);
         void CreateMovie(Movie movie);
-        IEnumerable<Movie> GetMovieByIds(IEnumerable<Guid> ids, bool trackChanges);
+        Task<IEnumerable<Movie>> GetMovieByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
         void DeleteMovie(Movie movie);
     }
 }

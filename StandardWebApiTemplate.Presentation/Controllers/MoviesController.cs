@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 using Shared.Dtos.Movies;
+using StandardWebApiTemplate.Presentation.ActionFilters;
 using StandardWebApiTemplate.Presentation.ModelBinders;
 using System;
 using System.Collections.Generic;
@@ -22,71 +23,52 @@ namespace StandardWebApiTemplate.Presentation.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetMovies()
+        public async Task<IActionResult> GetMovies()
         {
-            var movies = service.MovieService.GetAllMovies(false);
+            var movies = await service.MovieService.GetAllMoviesAsync(false);
             return Ok(movies);
         }
         [HttpGet("{id:guid}", Name = "MovieById")]
-        public IActionResult GetMovie(Guid id)
+        public async Task<IActionResult> GetMovie(Guid id)
         {
-            var movie = service.MovieService.GetMovieById(id, false);
+            var movie = await service.MovieService.GetMovieByIdAsync(id, false);
             return Ok(movie);
         }
         [HttpPost]
-        public IActionResult CreateMovie([FromBody]CreateMovieDto createMovieDto)
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        public async Task<IActionResult> CreateMovie([FromBody]CreateMovieDto createMovieDto)
         {
-            if (createMovieDto is null)
-            {
-                return BadRequest("The object is null");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return UnprocessableEntity(ModelState);
-            }
-
-            var createdMovie = service.MovieService.CreateMovie(createMovieDto);
-
+            var createdMovie = await service.MovieService.CreateMovieAsync(createMovieDto);
             return CreatedAtRoute("MovieById", new { id = createdMovie.Id }, createdMovie);
         }
 
         [HttpGet("collection/{ids}", Name = "MovieCollection")]
-        public IActionResult GetMovieCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]IEnumerable<Guid> ids)
+        public async Task<IActionResult> GetMovieCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]IEnumerable<Guid> ids)
         {
-            var movies= service.MovieService.GetMoviesByIds(ids, false);
+            var movies= await service.MovieService.GetMoviesByIdsAsync(ids, false);
             return Ok(movies);
         }
 
         [HttpPost("collection")]
-        public IActionResult CreateMovieCollection([FromBody]IEnumerable<CreateMovieDto> createMovieCollectionDto)
+        public async Task<IActionResult> CreateMovieCollection([FromBody]IEnumerable<CreateMovieDto> createMovieCollectionDto)
         {
-            var result = service.MovieService.CreateMovieCollection(createMovieCollectionDto);
+            var result = await service.MovieService.CreateMovieCollectionAsync(createMovieCollectionDto);
 
             return CreatedAtRoute("MovieCollection", new { result.ids }, result.movies);
         }
 
         [HttpDelete("{id:guid}")]
-        public IActionResult DeleteMovie(Guid id)
+        public async Task<IActionResult> DeleteMovie(Guid id)
         {
-            service.MovieService.DeleteMovie(id, false);
+            await service.MovieService.DeleteMovieAsync(id, false);
             return NoContent();
         }
 
         [HttpPut("{id:guid}")]
-        public IActionResult UpdateMovie(Guid id, [FromBody]UpdateMovieDto updateMovie)
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        public async Task<IActionResult> UpdateMovie(Guid id, [FromBody]UpdateMovieDto updateMovie)
         {
-            if(updateMovie == null)
-            {
-                return BadRequest("The object is null");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return UnprocessableEntity(ModelState);
-            }
-
-            service.MovieService.UpdateMovie(id, updateMovie, true);
+            await service.MovieService.UpdateMovieAsync(id, updateMovie, true);
             return NoContent();
         }
     }

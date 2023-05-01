@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 using Shared.Dtos.Costs;
+using Shared.RequestFeatures;
+using StandardWebApiTemplate.Presentation.ActionFilters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,57 +23,38 @@ namespace StandardWebApiTemplate.Presentation.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetCostsForMovie(Guid movieId)
+        public async Task<IActionResult> GetCostsForMovie(Guid movieId, [FromQuery] CostParameters costParameters)
         {
-            var costs = service.CostService.GetCosts(movieId, false);
+            var costs = await service.CostService.GetCostsAsync(movieId,costParameters, false);
             return Ok(costs);
         }
 
         [HttpGet("{id:guid}", Name = "GetCostForMovie")]
-        public IActionResult GetCostForMovie(Guid movieId, Guid id)
+        public async Task<IActionResult> GetCostForMovie(Guid movieId, Guid id)
         {
-            var cost = service.CostService.GetCost(movieId, id, false);
+            var cost = await service.CostService.GetCostAsync(movieId, id, false);
             return Ok(cost);
         }
 
         [HttpPost]
-        public IActionResult CreateCostForMovie(Guid movieId, [FromBody]CreateCostDto costDto)
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        public async Task<IActionResult> CreateCostForMovie(Guid movieId, [FromBody]CreateCostDto costDto)
         {
-            if (costDto == null)
-            {
-                return BadRequest("The object is null");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return UnprocessableEntity(ModelState);
-            }
-
-            var createdCost = service.CostService.CreateCost(movieId, costDto, false);
-
+            var createdCost = await service.CostService.CreateCostAsync(movieId, costDto, false);
             return CreatedAtRoute("GetCostForMovie", new {movieId, id = createdCost.Id}, createdCost);
         }
         [HttpDelete("{id:guid}")]
-        public IActionResult DeleteCost(Guid movieId, Guid id)
+        public async Task<IActionResult> DeleteCost(Guid movieId, Guid id)
         {
-            service.CostService.DeleteCost(movieId, id, false);
+            await service.CostService.DeleteCostAsync(movieId, id, false);
             return NoContent();
         }
 
         [HttpPut("{id:guid}")]
-        public IActionResult UpdateCost(Guid movieId, Guid id, [FromBody]UpdateCostDto updateCostDto) 
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        public async Task<IActionResult> UpdateCost(Guid movieId, Guid id, [FromBody]UpdateCostDto updateCostDto) 
         { 
-            if (updateCostDto == null)
-            {
-                return BadRequest("The object is null");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return UnprocessableEntity(ModelState);
-            }
-
-            service.CostService.UpdateCost(movieId, id, updateCostDto, false, true);
+            await service.CostService.UpdateCostAsync(movieId, id, updateCostDto, false, true);
             return NoContent();
         }
     }

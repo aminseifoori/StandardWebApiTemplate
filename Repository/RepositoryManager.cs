@@ -22,9 +22,9 @@ namespace Repository
         }
         public IMovieRepository Movie => movieRepository.Value;
         public ICostRepository Cost => costRepository.Value;
-        public void Save()
+        public async Task SaveAsync()
         {
-            repositoryContext.SaveChanges();
+            await repositoryContext.SaveChangesAsync();
         }
     }
 }

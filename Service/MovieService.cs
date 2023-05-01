@@ -20,35 +20,35 @@ namespace Service
             mapper = _mapper;
         }
 
-        public MovieDto CreateMovie(CreateMovieDto createMovie)
+        public async Task<MovieDto> CreateMovieAsync(CreateMovieDto createMovie)
         {
             var movie = mapper.Map<Movie>(createMovie);
             repositoryManager.Movie.CreateMovie(movie);
-            repositoryManager.Save();
+            await repositoryManager.SaveAsync();
             var movieDto = mapper.Map<MovieDto>(movie);
             return movieDto;
         }
 
-        public IEnumerable<MovieDto> GetAllMovies(bool trackChanges)
+        public async Task<IEnumerable<MovieDto>> GetAllMoviesAsync(bool trackChanges)
         {
-                var movies = repositoryManager.Movie.GetAllMovies(trackChanges);
+                var movies = await repositoryManager.Movie.GetAllMoviesAsync(trackChanges);
                 return mapper.Map<IEnumerable<MovieDto>>(movies);
         }
 
-        public MovieDto GetMovieById(Guid id, bool trackChanges)
+        public async Task<MovieDto> GetMovieByIdAsync(Guid id, bool trackChanges)
         {
-            var movie = repositoryManager.Movie.GetMovie(id, trackChanges) ?? throw new MovieNotFoundException(id);
+            var movie = await GetCompanyCheckExists(id, trackChanges);
             return mapper.Map<MovieDto>(movie);
         }
 
-        public IEnumerable<MovieDto> GetMoviesByIds(IEnumerable<Guid> ids, bool trackChanges)
+        public async Task<IEnumerable<MovieDto>> GetMoviesByIdsAsync(IEnumerable<Guid> ids, bool trackChanges)
         {
             if(ids is null)
             {
                 throw new IdParametersBadRequestException();
             }
 
-            var movies = repositoryManager.Movie.GetMovieByIds(ids, trackChanges);
+            var movies = await repositoryManager.Movie.GetMovieByIdsAsync(ids, trackChanges);
 
             if(movies.Count() != ids.Count())
             {
@@ -60,7 +60,7 @@ namespace Service
             return moviesDto;
         }
 
-        public (IEnumerable<MovieDto> movies, string ids) CreateMovieCollection(IEnumerable<CreateMovieDto> createMovieCollection)
+        public async Task<(IEnumerable<MovieDto> movies, string ids)> CreateMovieCollectionAsync(IEnumerable<CreateMovieDto> createMovieCollection)
         {
             if (createMovieCollection is null)
             {
@@ -72,7 +72,7 @@ namespace Service
             {
                 repositoryManager.Movie.CreateMovie(movie);
             }
-            repositoryManager.Save();
+            await repositoryManager.SaveAsync();
 
             var moviesReturn = mapper.Map<IEnumerable<MovieDto>>(movieCollection);
 
@@ -81,19 +81,25 @@ namespace Service
             return (movies: moviesReturn, ids: idsReturn);
         }
 
-        public void DeleteMovie(Guid id, bool trackChanges)
+        public async Task DeleteMovieAsync(Guid id, bool trackChanges)
         {
-            var movie = repositoryManager.Movie.GetMovie(id, trackChanges) ?? throw new MovieNotFoundException(id);
+            var movie = await GetCompanyCheckExists(id, trackChanges);
             repositoryManager.Movie.DeleteMovie(movie);
-            repositoryManager.Save();
+            await repositoryManager.SaveAsync();
         }
 
-        public void UpdateMovie(Guid id, UpdateMovieDto updateMovie, bool trackChanges)
+        public async Task UpdateMovieAsync(Guid id, UpdateMovieDto updateMovie, bool trackChanges)
         {
-            var movie = repositoryManager.Movie.GetMovie(id, trackChanges) ?? throw new MovieNotFoundException(id);
+            var movie = await GetCompanyCheckExists(id, trackChanges);
 
             mapper.Map(updateMovie, movie);
-            repositoryManager.Save();
+            await repositoryManager.SaveAsync();
+        }
+
+        private async Task<Movie> GetCompanyCheckExists(Guid id, bool trackChanges)
+        {
+            var movie = await repositoryManager.Movie.GetMovieAsync(id, trackChanges) ?? throw new MovieNotFoundException(id);
+            return movie;
         }
     }
 }

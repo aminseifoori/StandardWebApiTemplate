@@ -1,5 +1,6 @@
 ﻿using Domain.Models;
 using Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,19 +25,19 @@ namespace Repository
             Delete(movie);
         }
 
-        public IEnumerable<Movie> GetAllMovies(bool trackChanges)
+        public async Task<IEnumerable<Movie>> GetAllMoviesAsync(bool trackChanges)
         {
-            return FindAll(trackChanges).OrderBy(m=> m.Name).ToList();
+            return await FindAll(trackChanges).OrderBy(m=> m.Name).ToListAsync();
         }
 
-        public Movie GetMovie(Guid id, bool trachChanges)
+        public async Task<Movie> GetMovieAsync(Guid id, bool trachChanges)
         {
-            return FindByCondition(x => x.Id.Equals(id), trachChanges).SingleOrDefault();
+            return await FindByCondition(x => x.Id.Equals(id), trachChanges).SingleOrDefaultAsync();
         }
 
-        public IEnumerable<Movie> GetMovieByIds(IEnumerable<Guid> ids, bool trackChanges)
+        public async Task<IEnumerable<Movie>> GetMovieByIdsAsync(IEnumerable<Guid> ids, bool trackChanges)
         {
-            return FindByCondition(x=> ids.Contains(x.Id), trackChanges).ToList();
+            return await FindByCondition(x=> ids.Contains(x.Id), trackChanges).ToListAsync();
         }
     }
 }
