@@ -10,7 +10,7 @@ namespace Interfaces
 {
     public interface ICostRepository
     {
-        Task<IEnumerable<Cost>> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges);
+        Task<PagedList<Cost>> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges);
         Task<Cost> GetCostAsync(Guid movieId, Guid id, bool trackChanges);
         void CreateCostForMovie(Guid movieId, Cost cost);
         void DeleteCost(Cost cost);

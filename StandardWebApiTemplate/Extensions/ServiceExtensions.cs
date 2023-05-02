@@ -21,6 +21,7 @@ namespace StandardWebApiTemplate.Extensions
                     //builder.WithMethods();
                     builder.AllowAnyHeader();
                     //builder.WithHeaders();
+                    builder.WithExposedHeaders("X-Pagination");
                 });
             });
         }

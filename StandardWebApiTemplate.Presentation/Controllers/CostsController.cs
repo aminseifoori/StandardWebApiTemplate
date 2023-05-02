@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace StandardWebApiTemplate.Presentation.Controllers
@@ -25,8 +26,9 @@ namespace StandardWebApiTemplate.Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCostsForMovie(Guid movieId, [FromQuery] CostParameters costParameters)
         {
-            var costs = await service.CostService.GetCostsAsync(movieId,costParameters, false);
-            return Ok(costs);
+            var pagedResult = await service.CostService.GetCostsAsync(movieId,costParameters, false);
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+            return Ok(pagedResult.costs);
         }
 
         [HttpGet("{id:guid}", Name = "GetCostForMovie")]

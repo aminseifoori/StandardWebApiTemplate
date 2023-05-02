@@ -1,4 +1,5 @@
 ﻿using Domain.Models;
+using Shared.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Interfaces
 {
     public interface IMovieRepository
     {
-        Task<IEnumerable<Movie>> GetAllMoviesAsync(bool trackChanges);
+        Task<PagedList<Movie>> GetAllMoviesAsync(bool trackChanges, MovieParameters movieParameters);
         Task<Movie> GetMovieAsync(Guid id, bool trachChanges);
         void CreateMovie(Movie movie);
         Task<IEnumerable<Movie>> GetMovieByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);

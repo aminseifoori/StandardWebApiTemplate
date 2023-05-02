@@ -10,7 +10,7 @@ namespace Service.Interfaces
 {
     public interface ICostService
     {
-        Task<IEnumerable<CostDto>> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges);
+        Task<(IEnumerable<CostDto> costs, MetaData metaData)> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges);
         Task<CostDto> GetCostAsync(Guid movieId, Guid id, bool trachChanges);
         Task<CostDto> CreateCostAsync(Guid movieId, CreateCostDto createCostDto, bool trackChanges);
         Task DeleteCostAsync(Guid movieId, Guid id, bool trackChanges);

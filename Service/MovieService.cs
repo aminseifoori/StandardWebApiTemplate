@@ -4,6 +4,7 @@ using Domain.Models;
 using Interfaces;
 using Service.Interfaces;
 using Shared.Dtos.Movies;
+using Shared.RequestFeatures;
 
 namespace Service
 {
@@ -29,10 +30,11 @@ namespace Service
             return movieDto;
         }
 
-        public async Task<IEnumerable<MovieDto>> GetAllMoviesAsync(bool trackChanges)
+        public async Task<(IEnumerable<MovieDto> movies, MetaData metaData)> GetAllMoviesAsync(bool trackChanges, MovieParameters movieParameters)
         {
-                var movies = await repositoryManager.Movie.GetAllMoviesAsync(trackChanges);
-                return mapper.Map<IEnumerable<MovieDto>>(movies);
+            var movies = await repositoryManager.Movie.GetAllMoviesAsync(trackChanges, movieParameters);
+            var moviesDto = mapper.Map<IEnumerable<MovieDto>>(movies);
+            return (movies: moviesDto, metaData: movies.MetaData);
         }
 
         public async Task<MovieDto> GetMovieByIdAsync(Guid id, bool trackChanges)
@@ -43,14 +45,14 @@ namespace Service
 
         public async Task<IEnumerable<MovieDto>> GetMoviesByIdsAsync(IEnumerable<Guid> ids, bool trackChanges)
         {
-            if(ids is null)
+            if (ids is null)
             {
                 throw new IdParametersBadRequestException();
             }
 
             var movies = await repositoryManager.Movie.GetMovieByIdsAsync(ids, trackChanges);
 
-            if(movies.Count() != ids.Count())
+            if (movies.Count() != ids.Count())
             {
                 throw new CollectionByIdsBadErquestException();
             }

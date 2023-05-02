@@ -33,13 +33,16 @@ namespace Repository
             return cost;
         }
 
-        public async Task<IEnumerable<Cost>> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges)
+        public async Task<PagedList<Cost>> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges)
         {
-            return await FindByCondition(m => m.MovieId.Equals(id), trackChanges)
+            var costs = await FindByCondition(m => m.MovieId.Equals(id), trackChanges)
                 .OrderBy(o=> o.Amount)
                 .Skip((costParameters.PageNumber - 1) * costParameters.PageSize)
                 .Take(costParameters.PageSize)
                 .ToListAsync();
+            var count = await FindByCondition(m => m.MovieId.Equals(id), trackChanges).CountAsync();
+
+            return PagedList<Cost>.ToPagedList(costs, count ,costParameters.PageNumber, costParameters.PageSize);
         }
     }
 }

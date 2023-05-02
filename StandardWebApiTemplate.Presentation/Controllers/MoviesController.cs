@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 using Shared.Dtos.Movies;
+using Shared.RequestFeatures;
 using StandardWebApiTemplate.Presentation.ActionFilters;
 using StandardWebApiTemplate.Presentation.ModelBinders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace StandardWebApiTemplate.Presentation.Controllers
@@ -23,10 +25,11 @@ namespace StandardWebApiTemplate.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMovies()
+        public async Task<IActionResult> GetMovies([FromQuery] MovieParameters movieParameters)
         {
-            var movies = await service.MovieService.GetAllMoviesAsync(false);
-            return Ok(movies);
+            var pagedResult = await service.MovieService.GetAllMoviesAsync(false, movieParameters);
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+            return Ok(pagedResult.movies);
         }
         [HttpGet("{id:guid}", Name = "MovieById")]
         public async Task<IActionResult> GetMovie(Guid id)

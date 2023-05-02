@@ -60,18 +60,20 @@ namespace Service
             return costDto;
         }
 
-        public async Task<IEnumerable<CostDto>> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges)
+        public async Task<(IEnumerable<CostDto> costs, MetaData metaData)> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges)
         {
-            var movie = await GetCompanyCheckExists(id, trackChanges);
+            await GetCompanyCheckExists(id, trackChanges);
 
-            var costs = await repositoryManager.Cost.GetCostsAsync(movie.Id,costParameters, trackChanges);
+            var costs = await repositoryManager.Cost.GetCostsAsync(id,costParameters, trackChanges);
 
-            return mapper.Map<IEnumerable<CostDto>>(costs);
+            var costsDto = mapper.Map<IEnumerable<CostDto>>(costs);
+
+            return (costs: costsDto, metaData: costs.MetaData);
         }
 
         public async Task UpdateCostAsync(Guid movieId, Guid id, UpdateCostDto updateCostDto, bool movieTrackChanges, bool costTrackChanges)
         {
-            var movie = await GetCompanyCheckExists(movieId, movieTrackChanges);
+            await GetCompanyCheckExists(movieId, movieTrackChanges);
 
             var cost = await GetCostCheckExist(movieId, id, costTrackChanges);
 
