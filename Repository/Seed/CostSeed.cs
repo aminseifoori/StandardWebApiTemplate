@@ -18,13 +18,15 @@ namespace Repository.Seed
                  new Cost
                  {
                      Id = new Guid ("c9d4c053-49b6-410c-bc78-2d54a9991870"),
-                     Amount = 12525.25,
+                     Amount = (decimal)12525.25,
+                     Description = "Trasnportation",
                      MovieId = new Guid ("80abbca8-664d-4b20-b5de-024705497d4a")
                  },
                  new Cost
                  {
                      Id = new Guid("3d490a70-94ce-4d15-9494-5248280c2ce3"),
-                     Amount = 1584781.55,
+                     Amount = (decimal)1584781.55,
+                     Description = "Admin Fee",
                      MovieId = new Guid("80abbca8-664d-4b20-b5de-024705497d4a")
                  }
                 );

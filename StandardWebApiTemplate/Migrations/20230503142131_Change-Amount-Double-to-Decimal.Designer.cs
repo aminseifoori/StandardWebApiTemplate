@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository;
 
@@ -11,9 +12,11 @@ using Repository;
 namespace StandardWebApiTemplate.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20230503142131_Change-Amount-Double-to-Decimal")]
+    partial class ChangeAmountDoubletoDecimal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,9 +34,6 @@ namespace StandardWebApiTemplate.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid>("MovieId")
                         .HasColumnType("uniqueidentifier");
 
@@ -48,14 +48,12 @@ namespace StandardWebApiTemplate.Migrations
                         {
                             Id = new Guid("c9d4c053-49b6-410c-bc78-2d54a9991870"),
                             Amount = 12525.25m,
-                            Description = "Trasnportation",
                             MovieId = new Guid("80abbca8-664d-4b20-b5de-024705497d4a")
                         },
                         new
                         {
                             Id = new Guid("3d490a70-94ce-4d15-9494-5248280c2ce3"),
                             Amount = 1584781.55m,
-                            Description = "Admin Fee",
                             MovieId = new Guid("80abbca8-664d-4b20-b5de-024705497d4a")
                         });
                 });

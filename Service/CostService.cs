@@ -62,6 +62,10 @@ namespace Service
 
         public async Task<(IEnumerable<CostDto> costs, MetaData metaData)> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges)
         {
+            if (!costParameters.ValidAmountRange)
+            {
+                throw new AmountRangeBadRequestException();
+            }
             await GetCompanyCheckExists(id, trackChanges);
 
             var costs = await repositoryManager.Cost.GetCostsAsync(id,costParameters, trackChanges);

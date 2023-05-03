@@ -1,6 +1,7 @@
 ﻿using Domain.Models;
 using Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Repository.Extensions;
 using Shared.RequestFeatures;
 using System;
 using System.Collections.Generic;
@@ -35,14 +36,15 @@ namespace Repository
 
         public async Task<PagedList<Cost>> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges)
         {
-            var costs = await FindByCondition(m => m.MovieId.Equals(id), trackChanges)
-                .OrderBy(o=> o.Amount)
-                .Skip((costParameters.PageNumber - 1) * costParameters.PageSize)
-                .Take(costParameters.PageSize)
-                .ToListAsync();
-            var count = await FindByCondition(m => m.MovieId.Equals(id), trackChanges).CountAsync();
-
-            return PagedList<Cost>.ToPagedList(costs, count ,costParameters.PageNumber, costParameters.PageSize);
+                var costs = await FindByCondition(m => m.MovieId.Equals(id), trackChanges)
+                    .FilterCost(costParameters.MinAmount, costParameters.MaxAmount)
+                    .SearchCost(costParameters.SearchTerm)
+                    .Sort(costParameters.OrderBy)
+                    .Skip((costParameters.PageNumber - 1) * costParameters.PageSize)
+                    .Take(costParameters.PageSize)
+                    .ToListAsync();
+                var count = await FindByCondition(m => m.MovieId.Equals(id), trackChanges).CountAsync();
+                return PagedList<Cost>.ToPagedList(costs, count, costParameters.PageNumber, costParameters.PageSize);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Shared.Dtos.Costs
     public record CostDto
     {
         public Guid Id { get; init; }
-        public double Amount { get; init; }
+        public decimal Amount { get; init; }
+        public string? Description { get; set; }
     }
 }
