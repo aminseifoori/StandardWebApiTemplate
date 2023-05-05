@@ -1,7 +1,11 @@
+using Contracts;
 using Interfaces;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using NLog;
+using Service.DataShaping;
+using Shared.Dtos.Costs;
+using Shared.Dtos.Movies;
 using StandardWebApiTemplate.Extensions;
 using StandardWebApiTemplate.Presentation.ActionFilters;
 
@@ -23,6 +27,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 });
 
 builder.Services.AddScoped<ValidationFilterAttribute>();
+
+builder.Services.AddScoped<IDataShaper<CostDto>, DataShaper<CostDto>>();
+builder.Services.AddScoped<IDataShaper<MovieDto>, DataShaper<MovieDto>>();
 
 builder.Services.AddControllers(config =>
     {

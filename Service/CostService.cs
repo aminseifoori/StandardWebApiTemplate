@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using Contracts;
 using Domain.Exceptions;
 using Domain.Models;
+using Entities.Models;
 using Interfaces;
+using Service.DataShaping;
 using Service.Interfaces;
 using Shared.Dtos.Costs;
 using Shared.RequestFeatures;
@@ -18,12 +21,15 @@ namespace Service
         private readonly IRepositoryManager repositoryManager;
         private readonly ILoggerManager loggerManager;
         private readonly IMapper mapper;
+        private readonly IDataShaper<CostDto> dataShaper;
 
-        public CostService(IRepositoryManager _repositoryManager, ILoggerManager _loggerManager, IMapper _mapper)
+        public CostService(IRepositoryManager _repositoryManager, ILoggerManager _loggerManager, IMapper _mapper,
+            IDataShaper<CostDto> _dataShaper)
         {
             repositoryManager = _repositoryManager;
             loggerManager = _loggerManager;
             mapper = _mapper;
+            dataShaper = _dataShaper;
         }
 
         public async Task<CostDto> CreateCostAsync(Guid movieId, CreateCostDto createCostDto, bool trackChanges)
@@ -60,7 +66,7 @@ namespace Service
             return costDto;
         }
 
-        public async Task<(IEnumerable<CostDto> costs, MetaData metaData)> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges)
+        public async Task<(IEnumerable<Entity> costs, MetaData metaData)> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges)
         {
             if (!costParameters.ValidAmountRange)
             {
@@ -71,8 +77,9 @@ namespace Service
             var costs = await repositoryManager.Cost.GetCostsAsync(id,costParameters, trackChanges);
 
             var costsDto = mapper.Map<IEnumerable<CostDto>>(costs);
+            var shapedData = dataShaper.ShapeData(costsDto, costParameters.Fields);
 
-            return (costs: costsDto, metaData: costs.MetaData);
+            return (costs: shapedData, metaData: costs.MetaData);
         }
 
         public async Task UpdateCostAsync(Guid movieId, Guid id, UpdateCostDto updateCostDto, bool movieTrackChanges, bool costTrackChanges)

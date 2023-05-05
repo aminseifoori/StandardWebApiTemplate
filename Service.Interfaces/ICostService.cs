@@ -1,4 +1,5 @@
-﻿using Shared.Dtos.Costs;
+﻿using Entities.Models;
+using Shared.Dtos.Costs;
 using Shared.RequestFeatures;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace Service.Interfaces
 {
     public interface ICostService
     {
-        Task<(IEnumerable<CostDto> costs, MetaData metaData)> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges);
+        Task<(IEnumerable<Entity> costs, MetaData metaData)> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges);
         Task<CostDto> GetCostAsync(Guid movieId, Guid id, bool trachChanges);
         Task<CostDto> CreateCostAsync(Guid movieId, CreateCostDto createCostDto, bool trackChanges);
         Task DeleteCostAsync(Guid movieId, Guid id, bool trackChanges);

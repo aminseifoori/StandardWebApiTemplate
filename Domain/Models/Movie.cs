@@ -16,6 +16,8 @@ namespace Domain.Models
         public string? Name { get; set; }
         [MaxLength(500)]
         public string? Description { get; set; }
+        [Range(1880, 3000)]
+        public int ProductionYear { get; set; }
         public ICollection<Cost>? Costs { get; set; }
 
     }

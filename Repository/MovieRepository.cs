@@ -1,6 +1,7 @@
 ﻿using Domain.Models;
 using Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Repository.Extensions;
 using Shared.RequestFeatures;
 using System;
 using System.Collections.Generic;
@@ -26,10 +27,12 @@ namespace Repository
             Delete(movie);
         }
 
-        public async Task<PagedList<Movie>> GetAllMoviesAsync(bool trackChanges, MovieParameters movieParameters)
+        public async Task<PagedList<Movie>> GetAllMoviesAsync(MovieParameters movieParameters, bool trackChanges)
         {
             var movies =  await FindAll(trackChanges)
-                .OrderBy(m=> m.Name)
+                .FilterRange(movieParameters.FromYear.ToString(), movieParameters.ToYear.ToString(), "ProductionYear")
+                .Search("Description", movieParameters.SearchTerm)
+                .Sort(movieParameters.OrderBy, "Name")
                 .Skip((movieParameters.PageNumber - 1) * movieParameters.PageSize)
                 .Take(movieParameters.PageSize)
                 .ToListAsync();

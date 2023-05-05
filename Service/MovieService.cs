@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
+using Contracts;
 using Domain.Exceptions;
 using Domain.Models;
+using Entities.Models;
 using Interfaces;
 using Service.Interfaces;
+using Shared.Dtos.Costs;
 using Shared.Dtos.Movies;
 using Shared.RequestFeatures;
+using System.Security.Cryptography;
 
 namespace Service
 {
@@ -13,12 +17,15 @@ namespace Service
         private readonly IRepositoryManager repositoryManager;
         private readonly ILoggerManager loggerManager;
         private readonly IMapper mapper;
+        private readonly IDataShaper<MovieDto> dataShaper;
 
-        public MovieService(IRepositoryManager _repositoryManager, ILoggerManager LoggerManager, IMapper _mapper)
+        public MovieService(IRepositoryManager _repositoryManager, ILoggerManager LoggerManager, IMapper _mapper,
+            IDataShaper<MovieDto> _dataShaper)
         {
             repositoryManager = _repositoryManager;
             loggerManager = LoggerManager;
             mapper = _mapper;
+            dataShaper = _dataShaper;
         }
 
         public async Task<MovieDto> CreateMovieAsync(CreateMovieDto createMovie)
@@ -30,11 +37,14 @@ namespace Service
             return movieDto;
         }
 
-        public async Task<(IEnumerable<MovieDto> movies, MetaData metaData)> GetAllMoviesAsync(bool trackChanges, MovieParameters movieParameters)
+        public async Task<(IEnumerable<Entity> movies, MetaData metaData)> GetAllMoviesAsync(MovieParameters movieParameters, bool trackChanges)
         {
-            var movies = await repositoryManager.Movie.GetAllMoviesAsync(trackChanges, movieParameters);
+            if (!movieParameters.ValidYearRange)
+                throw new MovieYearRangeBadRequest();
+            var movies = await repositoryManager.Movie.GetAllMoviesAsync(movieParameters, trackChanges);
             var moviesDto = mapper.Map<IEnumerable<MovieDto>>(movies);
-            return (movies: moviesDto, metaData: movies.MetaData);
+            var shapedData = dataShaper.ShapeData(moviesDto, movieParameters.Fields);
+            return (movies: shapedData, metaData: movies.MetaData);
         }
 
         public async Task<MovieDto> GetMovieByIdAsync(Guid id, bool trackChanges)

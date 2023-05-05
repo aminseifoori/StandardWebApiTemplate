@@ -30,21 +30,21 @@ namespace Repository
 
         public async Task<Cost> GetCostAsync(Guid movieId, Guid id, bool trackChanges)
         {
-            var cost = await FindByCondition(m => m.MovieId.Equals(movieId) &&  m.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+            var cost = await FindByCondition(m => m.MovieId.Equals(movieId) && m.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
             return cost;
         }
 
-        public async Task<PagedList<Cost>> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges)
+        public async Task<PagedList<Cost>> GetCostsAsync(Guid id, CostParameters costParameters, bool trackChanges)
         {
-                var costs = await FindByCondition(m => m.MovieId.Equals(id), trackChanges)
-                    .FilterCost(costParameters.MinAmount, costParameters.MaxAmount)
-                    .SearchCost(costParameters.SearchTerm)
-                    .Sort(costParameters.OrderBy)
-                    .Skip((costParameters.PageNumber - 1) * costParameters.PageSize)
-                    .Take(costParameters.PageSize)
-                    .ToListAsync();
-                var count = await FindByCondition(m => m.MovieId.Equals(id), trackChanges).CountAsync();
-                return PagedList<Cost>.ToPagedList(costs, count, costParameters.PageNumber, costParameters.PageSize);
+            var test = await FindByCondition(m => m.MovieId.Equals(id), trackChanges)
+                .FilterRange(costParameters.MinAmount.ToString(), costParameters.MaxAmount.ToString(), "Amount")
+                .Search("Description", costParameters.SearchTerm)
+                .Sort(costParameters.OrderBy, "Amount")
+                .Skip((costParameters.PageNumber - 1) * costParameters.PageSize)
+                .Take(costParameters.PageSize)
+                .ToListAsync();
+            var count = await FindByCondition(m => m.MovieId.Equals(id), trackChanges).CountAsync();
+            return PagedList<Cost>.ToPagedList(test, count, costParameters.PageNumber, costParameters.PageSize);
         }
     }
 }

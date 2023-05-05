@@ -15,6 +15,8 @@ namespace Shared.Dtos.Movies
         public string? Name { get; init; }
         [MaxLength(500)]
         public string? Description { get; init; }
+        [Range(1880, 3000)]
+        public int ProductionYear { get; set; }
         public IEnumerable<CreateCostDto>? Costs { get; init; }
     }
 }

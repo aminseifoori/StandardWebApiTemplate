@@ -27,7 +27,7 @@ namespace StandardWebApiTemplate.Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> GetMovies([FromQuery] MovieParameters movieParameters)
         {
-            var pagedResult = await service.MovieService.GetAllMoviesAsync(false, movieParameters);
+            var pagedResult = await service.MovieService.GetAllMoviesAsync(movieParameters, false);
             Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
             return Ok(pagedResult.movies);
         }
