@@ -19,12 +19,12 @@ namespace Service
         private readonly Lazy<ICostService> costService;
 
         public ServiceManager(IRepositoryManager _repositoryManager, ILoggerManager _loggerManager, IMapper _mapper,
-            IDataShaper<CostDto> _costDataShaper, IDataShaper<MovieDto> _movieDataShaper)
+            IDataShaper<CostDto> _costDataShaper, IDataShaperNotHEATOAS<MovieDto> _movieDataShaper, ICostLinks _costLinks)
         {
 
             movieService = new Lazy<IMovieService>(() => new MovieService(_repositoryManager, _loggerManager, _mapper, _movieDataShaper));
-            costService = new Lazy<ICostService>(() => new CostService(_repositoryManager, _loggerManager, _mapper, _costDataShaper));
-
+            //costService = new Lazy<ICostService>(() => new CostService(_repositoryManager, _loggerManager, _mapper, _costDataShaper));
+            costService = new Lazy<ICostService>(() => new CostService(_repositoryManager, _loggerManager, _mapper, _costDataShaper, _costLinks));
         }
         public IMovieService MovieService => movieService.Value;
 

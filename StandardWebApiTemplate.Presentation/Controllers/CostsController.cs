@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Entities.LinkModels;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Service.Interfaces;
 using Shared.Dtos.Costs;
 using Shared.RequestFeatures;
@@ -23,12 +25,25 @@ namespace StandardWebApiTemplate.Presentation.Controllers
             service = _service;
         }
 
+        //[HttpGet]
+        //[ServiceFilter(typeof(ValidateMediaTypeAttribute))]
+        //public async Task<IActionResult> GetCostsForMovie(Guid movieId, [FromQuery] CostParameters costParameters)
+        //{
+        //    var pagedResult = await service.CostService.GetCostsAsync(movieId, costParameters, false);
+        //    Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+        //    return Ok(pagedResult.costs);
+        //}
+
         [HttpGet]
+        [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
         public async Task<IActionResult> GetCostsForMovie(Guid movieId, [FromQuery] CostParameters costParameters)
         {
-            var pagedResult = await service.CostService.GetCostsAsync(movieId,costParameters, false);
+            var linkParams = new LinkParameters(costParameters, HttpContext);
+
+            var pagedResult = await service.CostService.GetCostsAsync(movieId, linkParams, false);
             Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
-            return Ok(pagedResult.costs);
+            return pagedResult.linkResponse.HasLinks ? Ok(pagedResult.linkResponse.LinkedEntities) : 
+                Ok(pagedResult.linkResponse.ShapedEntities);
         }
 
         [HttpGet("{id:guid}", Name = "GetCostForMovie")]

@@ -17,10 +17,10 @@ namespace Service
         private readonly IRepositoryManager repositoryManager;
         private readonly ILoggerManager loggerManager;
         private readonly IMapper mapper;
-        private readonly IDataShaper<MovieDto> dataShaper;
+        private readonly IDataShaperNotHEATOAS<MovieDto> dataShaper;
 
         public MovieService(IRepositoryManager _repositoryManager, ILoggerManager LoggerManager, IMapper _mapper,
-            IDataShaper<MovieDto> _dataShaper)
+            IDataShaperNotHEATOAS<MovieDto> _dataShaper)
         {
             repositoryManager = _repositoryManager;
             loggerManager = LoggerManager;
@@ -43,7 +43,7 @@ namespace Service
                 throw new MovieYearRangeBadRequest();
             var movies = await repositoryManager.Movie.GetAllMoviesAsync(movieParameters, trackChanges);
             var moviesDto = mapper.Map<IEnumerable<MovieDto>>(movies);
-            var shapedData = dataShaper.ShapeData(moviesDto, movieParameters.Fields);
+            var shapedData = dataShaper.ShapeDataNH(moviesDto, movieParameters.Fields);
             return (movies: shapedData, metaData: movies.MetaData);
         }
 

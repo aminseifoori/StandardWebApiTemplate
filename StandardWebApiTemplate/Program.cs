@@ -8,6 +8,7 @@ using Shared.Dtos.Costs;
 using Shared.Dtos.Movies;
 using StandardWebApiTemplate.Extensions;
 using StandardWebApiTemplate.Presentation.ActionFilters;
+using StandardWebApiTemplate.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,10 +27,13 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = true; //This setting suppress the default model state validation that is implemented due to the existence of the [ApiController] attribute in all API controllers
 });
 
-builder.Services.AddScoped<ValidationFilterAttribute>();
+builder.Services.AddScoped<ValidationFilterAttribute>(); //Register Custom ValidationFilterAttribute (For checking the Dto and ModelState)
+builder.Services.AddScoped<ValidateMediaTypeAttribute>(); //Register Custom ValidateMediaTypeAttribute (HATEOAS)
+builder.Services.AddScoped<ICostLinks, CostLinks>(); //Register ICostLinks (HATEOAS)
 
-builder.Services.AddScoped<IDataShaper<CostDto>, DataShaper<CostDto>>();
-builder.Services.AddScoped<IDataShaper<MovieDto>, DataShaper<MovieDto>>();
+//DataShaper Classes
+builder.Services.AddScoped<IDataShaper<CostDto>, DataShaper<CostDto>>(); 
+builder.Services.AddScoped<IDataShaperNotHEATOAS<MovieDto>, DataShaperNotHEATOAS<MovieDto>>();
 
 builder.Services.AddControllers(config =>
     {
@@ -38,7 +42,8 @@ builder.Services.AddControllers(config =>
     })
     .AddXmlDataContractSerializerFormatters() //To accept xml output
     .AddApplicationPart(typeof(StandardWebApiTemplate.Presentation.AssemblyRefrence).Assembly); //to add controller from another project
-
+//Adding the custom media type extension fro HATEOAS
+builder.Services.AddCustomMediaTypes();
 
 var app = builder.Build();
 

@@ -2,6 +2,7 @@
 using Contracts;
 using Domain.Exceptions;
 using Domain.Models;
+using Entities.LinkModels;
 using Entities.Models;
 using Interfaces;
 using Service.DataShaping;
@@ -22,14 +23,16 @@ namespace Service
         private readonly ILoggerManager loggerManager;
         private readonly IMapper mapper;
         private readonly IDataShaper<CostDto> dataShaper;
+        private readonly ICostLinks costLinks;
 
         public CostService(IRepositoryManager _repositoryManager, ILoggerManager _loggerManager, IMapper _mapper,
-            IDataShaper<CostDto> _dataShaper)
+            IDataShaper<CostDto> _dataShaper, ICostLinks _costLinks)
         {
             repositoryManager = _repositoryManager;
             loggerManager = _loggerManager;
             mapper = _mapper;
             dataShaper = _dataShaper;
+            costLinks = _costLinks;
         }
 
         public async Task<CostDto> CreateCostAsync(Guid movieId, CreateCostDto createCostDto, bool trackChanges)
@@ -66,20 +69,21 @@ namespace Service
             return costDto;
         }
 
-        public async Task<(IEnumerable<Entity> costs, MetaData metaData)> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges)
+        public async Task<(LinkResponse linkResponse, MetaData metaData)> GetCostsAsync(Guid id,LinkParameters linkParameters, bool trackChanges)
         {
-            if (!costParameters.ValidAmountRange)
+            if (!linkParameters.costParameters.ValidAmountRange)
             {
                 throw new AmountRangeBadRequestException();
             }
             await GetCompanyCheckExists(id, trackChanges);
 
-            var costs = await repositoryManager.Cost.GetCostsAsync(id,costParameters, trackChanges);
+            var costs = await repositoryManager.Cost.GetCostsAsync(id,linkParameters.costParameters, trackChanges);
 
             var costsDto = mapper.Map<IEnumerable<CostDto>>(costs);
-            var shapedData = dataShaper.ShapeData(costsDto, costParameters.Fields);
+            //var shapedData = dataShaper.ShapeData(costsDto, costParameters.Fields);
+            var links = costLinks.TryGenerateLinks(costsDto, linkParameters.costParameters.Fields, id, linkParameters.Context);
 
-            return (costs: shapedData, metaData: costs.MetaData);
+            return (linkResponse: links, metaData: costs.MetaData);
         }
 
         public async Task UpdateCostAsync(Guid movieId, Guid id, UpdateCostDto updateCostDto, bool movieTrackChanges, bool costTrackChanges)

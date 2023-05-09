@@ -1,4 +1,5 @@
-﻿using Entities.Models;
+﻿using Entities.LinkModels;
+using Entities.Models;
 using Shared.Dtos.Costs;
 using Shared.RequestFeatures;
 using System;
@@ -11,7 +12,7 @@ namespace Service.Interfaces
 {
     public interface ICostService
     {
-        Task<(IEnumerable<Entity> costs, MetaData metaData)> GetCostsAsync(Guid id,CostParameters costParameters, bool trackChanges);
+        Task<(LinkResponse linkResponse, MetaData metaData)> GetCostsAsync(Guid id,LinkParameters linkParameters, bool trackChanges);
         Task<CostDto> GetCostAsync(Guid movieId, Guid id, bool trachChanges);
         Task<CostDto> CreateCostAsync(Guid movieId, CreateCostDto createCostDto, bool trackChanges);
         Task DeleteCostAsync(Guid movieId, Guid id, bool trackChanges);
