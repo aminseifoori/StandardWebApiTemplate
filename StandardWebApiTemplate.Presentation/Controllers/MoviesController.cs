@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace StandardWebApiTemplate.Presentation.Controllers
 {
-    [Route("api/[Controller]")]
+    [Route("api/movies")]
     [ApiController]
     public class MoviesController : ControllerBase
     {
@@ -24,7 +24,7 @@ namespace StandardWebApiTemplate.Presentation.Controllers
             service = _service;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "GetCompanies")]
         public async Task<IActionResult> GetMovies([FromQuery] MovieParameters movieParameters)
         {
             var pagedResult = await service.MovieService.GetAllMoviesAsync(movieParameters, false);
@@ -37,7 +37,7 @@ namespace StandardWebApiTemplate.Presentation.Controllers
             var movie = await service.MovieService.GetMovieByIdAsync(id, false);
             return Ok(movie);
         }
-        [HttpPost]
+        [HttpPost(Name = "CreateCompnay")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateMovie([FromBody]CreateMovieDto createMovieDto)
         {

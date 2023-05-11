@@ -11,6 +11,7 @@ namespace Interfaces
     public interface IMovieRepository
     {
         Task<PagedList<Movie>> GetAllMoviesAsync(MovieParameters movieParameters, bool trackChanges);
+        Task<List<Movie>> GetAllMoviesSimpleAsync(bool trackChanges);
         Task<Movie> GetMovieAsync(Guid id, bool trachChanges);
         void CreateMovie(Movie movie);
         Task<IEnumerable<Movie>> GetMovieByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);

@@ -7,6 +7,7 @@ namespace Service.Interfaces
     public interface IMovieService
     {
         Task<(IEnumerable<Entity> movies, MetaData metaData)> GetAllMoviesAsync(MovieParameters movieParameters, bool trackChanges);
+        Task<IEnumerable<MovieDto>> GetAllMoviesSimpleAsync(bool trackChanges);
         Task<MovieDto> GetMovieByIdAsync(Guid id, bool trackChanges);
         Task<MovieDto> CreateMovieAsync(CreateMovieDto company);
         Task<IEnumerable<MovieDto>> GetMoviesByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);

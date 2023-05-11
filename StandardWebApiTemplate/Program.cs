@@ -15,6 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 // Add services to the container.
 builder.Services.ConfigureCors();
+//Add Response Cache
+builder.Services.ConfigureResponseCaching();
+//Add Output Cache (.NET 7)
+builder.Services.ConfigureOutputCaching();
 builder.Services.ConfigureIISIntegration();
 builder.Services.ConfigureLoggerManager();
 builder.Services.ConfigureRepositoryManager();
@@ -39,11 +43,13 @@ builder.Services.AddControllers(config =>
     {
         config.RespectBrowserAcceptHeader = true; //To accept other output we need to add this settings
         config.ReturnHttpNotAcceptable = true; //To restirict the output to acceptable trpe
+        config.CacheProfiles.Add("120SecondsDuration", new CacheProfile { Duration = 120 }); //Add chaching profile
     })
     .AddXmlDataContractSerializerFormatters() //To accept xml output
     .AddApplicationPart(typeof(StandardWebApiTemplate.Presentation.AssemblyRefrence).Assembly); //to add controller from another project
 //Adding the custom media type extension fro HATEOAS
 builder.Services.AddCustomMediaTypes();
+builder.Services.ConfigureVersioning();
 
 var app = builder.Build();
 
@@ -65,6 +71,12 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 });
 
 app.UseCors("CorsPolicy");
+
+//Add Cache Middleware
+//app.UseResponseCaching();
+
+//Add Output Cache
+app.UseOutputCache();
 
 app.UseAuthorization();
 

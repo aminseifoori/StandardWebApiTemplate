@@ -47,6 +47,13 @@ namespace Service
             return (movies: shapedData, metaData: movies.MetaData);
         }
 
+        public async Task<IEnumerable<MovieDto>> GetAllMoviesSimpleAsync(bool trackChanges)
+        {
+            var movies = await repositoryManager.Movie.GetAllMoviesSimpleAsync(trackChanges);
+            var moviesDto = mapper.Map<IEnumerable<MovieDto>>(movies);
+            return moviesDto;
+        }
+
         public async Task<MovieDto> GetMovieByIdAsync(Guid id, bool trackChanges)
         {
             var movie = await GetCompanyCheckExists(id, trackChanges);

@@ -41,6 +41,13 @@ namespace Repository
             return PagedList<Movie>.ToPagedList(movies, count, movieParameters.PageNumber, movieParameters.PageSize);
         }
 
+        public async Task<List<Movie>> GetAllMoviesSimpleAsync(bool trackChanges)
+        {
+            var movies = await FindAll(trackChanges).ToListAsync();
+
+            return movies;
+        }
+
         public async Task<Movie> GetMovieAsync(Guid id, bool trachChanges)
         {
             return await FindByCondition(x => x.Id.Equals(id), trachChanges).SingleOrDefaultAsync();

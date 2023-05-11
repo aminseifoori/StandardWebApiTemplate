@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Repository;
 using Service;
 using Service.Interfaces;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace StandardWebApiTemplate.Extensions
 {
@@ -63,14 +64,38 @@ namespace StandardWebApiTemplate.Extensions
                     var systemTextJsonOutputFormatter = config.OutputFormatters.OfType<SystemTextJsonOutputFormatter>()?.FirstOrDefault();
                     if (systemTextJsonOutputFormatter != null)
                     {
-                        systemTextJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.codemaze.hateoas+json"); 
+                        systemTextJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.codemaze.hateoas+json");
+                        systemTextJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.codemaze.apiroot+json");
                     }
                     var xmlOutputFormatter = config.OutputFormatters.OfType<XmlDataContractSerializerOutputFormatter>()?.FirstOrDefault();
                     if (xmlOutputFormatter != null)
                     { 
-                        xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.codemaze.hateoas+xml"); 
+                        xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.codemaze.hateoas+xml");
+                        xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.codemaze.apiroot+xml");
                     } 
                 }); 
+        }
+        //Adding Versioning Ability to API (needs Microsoft.AspNetCore.Mvc.Versioning nuget package)
+        public static void ConfigureVersioning(this IServiceCollection services) 
+        { 
+            services.AddApiVersioning(opt => 
+                { 
+                    opt.ReportApiVersions = true;
+                    opt.AssumeDefaultVersionWhenUnspecified = true; 
+                    opt.DefaultApiVersion = new ApiVersion(1, 0);
+                    //opt.ApiVersionReader = new HeaderApiVersionReader("api-version"); we can add versioning through header
+                });
+        }
+
+        //Adding Cache-Store
+        public static void ConfigureResponseCaching(this IServiceCollection services)
+        {
+            services.AddResponseCaching();
+        }
+        //Add Output Cache (.NET 7)
+        public static void ConfigureOutputCaching(this IServiceCollection services)
+        {
+            services.AddOutputCache();
         }
 
     }
