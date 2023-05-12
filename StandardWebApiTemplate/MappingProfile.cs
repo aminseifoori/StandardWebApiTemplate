@@ -2,6 +2,7 @@
 using Domain.Models;
 using Shared.Dtos.Costs;
 using Shared.Dtos.Movies;
+using Shared.Dtos.Users;
 
 namespace StandardWebApiTemplate
 {
@@ -15,6 +16,7 @@ namespace StandardWebApiTemplate
             CreateMap<Cost, CreateCostDto>().ReverseMap();
             CreateMap<Cost, UpdateCostDto>().ReverseMap();
             CreateMap<Movie, UpdateMovieDto>().ReverseMap();
+            CreateMap<User, CreateUserDto>().ReverseMap();
         }
 
     }

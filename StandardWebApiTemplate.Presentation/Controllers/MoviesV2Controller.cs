@@ -23,11 +23,13 @@ namespace StandardWebApiTemplate.Presentation.Controllers
         {
             service = _service;
         }
-
+        //[HttpGet("output-nocache")] prevent output cache
         [HttpGet]
         //[ResponseCache(Duration = 60)] Use Response Cache
         //[ResponseCache(CacheProfileName = "120SecondsDuration")] Use Response Cache Profile (created on AddController)
-        [OutputCache(Duration = 60)] //Output Cache (.NET 7)
+        //[OutputCache(Duration = 60)] //Output Cache (.NET 7)
+        //[OutputCache(PolicyName = "20SecondsOutputCache")] //to use output cache policy
+        
         public async Task<ActionResult> GetMovies() 
         {
             var result = await service.MovieService.GetAllMoviesSimpleAsync(false);

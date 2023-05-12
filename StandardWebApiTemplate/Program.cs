@@ -16,9 +16,16 @@ LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nl
 // Add services to the container.
 builder.Services.ConfigureCors();
 //Add Response Cache
-builder.Services.ConfigureResponseCaching();
+//builder.Services.ConfigureResponseCaching();
 //Add Output Cache (.NET 7)
-builder.Services.ConfigureOutputCaching();
+//builder.Services.ConfigureOutputCaching();
+//Add Rate Limiting
+builder.Services.ConfigureRateLimitingOptions();
+
+//Add Authentication Services
+builder.Services.AddAuthentication();
+builder.Services.ConfigureIdentity();
+
 builder.Services.ConfigureIISIntegration();
 builder.Services.ConfigureLoggerManager();
 builder.Services.ConfigureRepositoryManager();
@@ -47,8 +54,9 @@ builder.Services.AddControllers(config =>
     })
     .AddXmlDataContractSerializerFormatters() //To accept xml output
     .AddApplicationPart(typeof(StandardWebApiTemplate.Presentation.AssemblyRefrence).Assembly); //to add controller from another project
-//Adding the custom media type extension fro HATEOAS
+//Adding the custom media type extension for HATEOAS
 builder.Services.AddCustomMediaTypes();
+//Versioning
 builder.Services.ConfigureVersioning();
 
 var app = builder.Build();
@@ -70,14 +78,18 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.All
 });
 
+//Add Rate Limiter
+app.UseRateLimiter();
+
 app.UseCors("CorsPolicy");
 
 //Add Cache Middleware
 //app.UseResponseCaching();
 
 //Add Output Cache
-app.UseOutputCache();
+//app.UseOutputCache();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

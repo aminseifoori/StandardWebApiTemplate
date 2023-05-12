@@ -10,5 +10,6 @@ namespace Service.Interfaces
     {
         IMovieService MovieService { get;}
         ICostService CostService { get;}
+        IUserAccountService UserAccountService { get;}
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Service.Interfaces;
 using Shared.Dtos.Movies;
 using Shared.RequestFeatures;
@@ -25,6 +26,9 @@ namespace StandardWebApiTemplate.Presentation.Controllers
         }
 
         [HttpGet(Name = "GetCompanies")]
+        
+        //[DisableRateLimiting] // To Disable Global Limiting
+        //[EnableRateLimiting("SpecificPolicy")] // To enable specific limiting
         public async Task<IActionResult> GetMovies([FromQuery] MovieParameters movieParameters)
         {
             var pagedResult = await service.MovieService.GetAllMoviesAsync(movieParameters, false);
