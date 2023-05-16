@@ -13,6 +13,6 @@ namespace Shared.Dtos.Costs
         [Required]
         [RegularExpression("^[0-9]{1,16}(?:\\.[0-9]{1,2})?$", ErrorMessage = "The amount should be maximum 16 digits with maximum of 2 decimal digits")]
         public decimal Amount { get; init; }
-        public string? Description { get; set; }
+        public string? Description { get; init; }
     }
 }

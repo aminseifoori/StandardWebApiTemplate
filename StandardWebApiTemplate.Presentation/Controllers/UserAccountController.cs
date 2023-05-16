@@ -36,5 +36,15 @@ namespace StandardWebApiTemplate.Presentation.Controllers
             }
             return StatusCode(201);
         }
+
+        [HttpPost("login")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        public async Task<IActionResult> Authenticate([FromBody] LoginDto user) 
+        { 
+            if (!await service.UserAccountService.ValidateUser(user))
+                return Unauthorized();
+            var tokenDto = await service.UserAccountService.CreateToken(true);
+            return Ok(tokenDto);
+        }
     }
 }

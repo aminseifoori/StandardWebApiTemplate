@@ -11,6 +11,6 @@ namespace Shared.Dtos.Movies
         public Guid Id { get; init; }
         public string? Name { get; init; }
         public string? Description { get; init; }
-        public int ProductionYear { get; set; }
+        public int ProductionYear { get; init; }
     }
 }

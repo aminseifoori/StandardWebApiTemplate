@@ -25,6 +25,8 @@ builder.Services.ConfigureRateLimitingOptions();
 //Add Authentication Services
 builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
+//Add JWT
+builder.Services.ConfigureJWT(builder.Configuration);
 
 builder.Services.ConfigureIISIntegration();
 builder.Services.ConfigureLoggerManager();

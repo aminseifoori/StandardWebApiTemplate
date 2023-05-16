@@ -11,6 +11,9 @@ using System.Threading.RateLimiting;
 using System.Linq.Dynamic.Core.Tokenizer;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace StandardWebApiTemplate.Extensions
 {
@@ -162,7 +165,34 @@ namespace StandardWebApiTemplate.Extensions
                     option.Password.RequireNonAlphanumeric = false; 
                     option.Password.RequiredLength = 6; 
                     option.User.RequireUniqueEmail = true;
-                }).AddEntityFrameworkStores<RepositoryContext>().AddDefaultTokenProviders(); }
+                }).AddEntityFrameworkStores<RepositoryContext>().AddDefaultTokenProviders(); 
+        }
+
+        //Add JWT
+
+        public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
+        { 
+            var jwtSettings = configuration.GetSection("JwtSettings");
+            //var secretKey = Environment.GetEnvironmentVariable("SECRET");
+            var secretKey = configuration.GetSection("JwtSecters:JwtSecters").Value;
+            services.AddAuthentication(opt => 
+            { 
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; 
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
+            }).AddJwtBearer(options => 
+            { 
+                options.TokenValidationParameters = new TokenValidationParameters 
+                { 
+                    ValidateIssuer = true, 
+                    ValidateAudience = true, 
+                    ValidateLifetime = true, 
+                    ValidateIssuerSigningKey = true, 
+                    ValidIssuer = jwtSettings["validIssuer"], 
+                    ValidAudience = jwtSettings["validAudience"], 
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)) 
+                }; 
+            }); 
+        }
 
     }
 }

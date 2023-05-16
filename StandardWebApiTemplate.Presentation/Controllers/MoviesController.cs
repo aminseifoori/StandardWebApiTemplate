@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Service.Interfaces;
 using Shared.Dtos.Movies;
@@ -26,9 +27,10 @@ namespace StandardWebApiTemplate.Presentation.Controllers
         }
 
         [HttpGet(Name = "GetCompanies")]
-        
+
         //[DisableRateLimiting] // To Disable Global Limiting
         //[EnableRateLimiting("SpecificPolicy")] // To enable specific limiting
+        [Authorize]
         public async Task<IActionResult> GetMovies([FromQuery] MovieParameters movieParameters)
         {
             var pagedResult = await service.MovieService.GetAllMoviesAsync(movieParameters, false);
@@ -65,6 +67,7 @@ namespace StandardWebApiTemplate.Presentation.Controllers
         }
 
         [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteMovie(Guid id)
         {
             await service.MovieService.DeleteMovieAsync(id, false);
