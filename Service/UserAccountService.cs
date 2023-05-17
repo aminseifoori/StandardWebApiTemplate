@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Domain.ConfigurationModels;
 using Domain.Exceptions;
 using Domain.Models;
 using Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Service.Interfaces;
 using Shared.Dtos.Users;
@@ -23,16 +25,32 @@ namespace Service
         private readonly ILoggerManager logger;
         private readonly IMapper mapper;
         private readonly UserManager<User> userManager;
+        private readonly IOptions<JwtConfiguration> iOptionJWTconfiguration; // to be replaced with the below line
         private readonly IConfiguration configuration;
         private User? user;
+        //To use configuration binding we add the below line.
+        private readonly JwtConfiguration _jwtConfiguration;
 
         public UserAccountService(ILoggerManager _logger,
-            IMapper _mapper, UserManager<User> _userManager, IConfiguration _configuration)
+            IMapper _mapper, UserManager<User> _userManager,
+            IConfiguration _configuration,
+            IOptions<JwtConfiguration> _IOptionJWTconfiguration)
         {
             logger = _logger;
             mapper = _mapper;
             userManager = _userManager;
+            iOptionJWTconfiguration = _IOptionJWTconfiguration;
+
             configuration = _configuration;
+
+            //to use configuration binding
+            //_jwtConfiguration = new JwtConfiguration();
+            //_configuration.Bind(_jwtConfiguration.Section, _jwtConfiguration); //Bind needs Microsoft.Extensions.Configuration.Binder
+
+            // as we desicded to use IOption configuration we need to comment the above lines 
+
+            _jwtConfiguration = _IOptionJWTconfiguration.Value;
+
         }
 
         public async Task<IdentityResult> RegisterUser(CreateUserDto createUserDto)
@@ -94,7 +112,7 @@ namespace Service
         { 
             var principal = GetPrincipalFromExpiredToken(tokenDto.AccessToken);
             var _user = await userManager.FindByNameAsync(principal.Identity.Name);
-            if (user == null || user.RefreshToken != tokenDto.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+            if (_user == null || _user.RefreshToken != tokenDto.RefreshToken || _user.RefreshTokenExpiryTime <= DateTime.Now)
                 throw new RefreshTokenBadRequest();
             user = _user;
             return await CreateToken(populateExp: false);
@@ -124,13 +142,18 @@ namespace Service
 
         private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
         { 
-            var jwtSettings = configuration.GetSection("JwtSettings");
+            //var jwtSettings = configuration.GetSection("JwtSettings"); for using configuration binding we can remove this line
             var tokenOptions = new JwtSecurityToken
-                (issuer: jwtSettings["validIssuer"],
-                audience: jwtSettings["validAudience"],
-                claims: claims, 
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["expires"])
-                ), signingCredentials: signingCredentials); 
+                (
+                    //issuer: jwtSettings["validIssuer"], for using configuration binding we can remove this line
+                    //audience: jwtSettings["validAudience"], for using configuration binding we can remove this line
+                    issuer: _jwtConfiguration.ValidIssuer, 
+                    audience: _jwtConfiguration.ValidAudience,
+                    claims: claims,
+                    //expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["expires"]) for using configuration binding we can remove this line
+                    expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtConfiguration.Expires)),
+                    signingCredentials: signingCredentials
+                ); 
             return tokenOptions; 
         }
 
@@ -146,7 +169,7 @@ namespace Service
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
-            var jwtSettings = configuration.GetSection("JwtSettings");
+            //var jwtSettings = configuration.GetSection("JwtSettings"); this can be removed when we added the configuration binding
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = true,
@@ -154,8 +177,10 @@ namespace Service
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("JwtSecters:JwtSecters").Value)),
                 ValidateLifetime = true, //if you want to allow the refresh token functionality for the expired token as well, set this property to false.
-                ValidIssuer = jwtSettings["validIssuer"],
-                ValidAudience = jwtSettings["validAudience"]
+                //ValidIssuer = jwtSettings["validIssuer"], this can be removed when we added the configuration binding
+                //ValidAudience = jwtSettings["validAudience"] this can be removed when we added the configuration binding
+                ValidIssuer = _jwtConfiguration.ValidIssuer,
+                ValidAudience = _jwtConfiguration.ValidAudience
             };
             var tokenHandler = new JwtSecurityTokenHandler();
             SecurityToken securityToken;

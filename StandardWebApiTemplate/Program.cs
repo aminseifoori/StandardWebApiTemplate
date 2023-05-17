@@ -27,6 +27,8 @@ builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
 //Add JWT
 builder.Services.ConfigureJWT(builder.Configuration);
+//Adding IOption Configuration setting
+builder.Services.AddJwtConfiguration(builder.Configuration);
 
 builder.Services.ConfigureIISIntegration();
 builder.Services.ConfigureLoggerManager();

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Domain.ConfigurationModels;
 
 namespace StandardWebApiTemplate.Extensions
 {
@@ -63,7 +64,7 @@ namespace StandardWebApiTemplate.Extensions
                 options.UseSqlServer(configuration.GetConnectionString("default"));
             });
         }
-        //Define new Media Type - HATEOAS
+        //Define new Media Type - HATEOAS & APIRoot
         public static void AddCustomMediaTypes(this IServiceCollection services) 
         { 
             services.Configure<MvcOptions>(config => 
@@ -171,8 +172,11 @@ namespace StandardWebApiTemplate.Extensions
         //Add JWT
 
         public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
-        { 
-            var jwtSettings = configuration.GetSection("JwtSettings");
+        {
+            //var jwtSettings = configuration.GetSection("JwtSettings"); For binding the setting we can use the belwo line instead of this line
+            var jwtConfiguration = new JwtConfiguration();
+            configuration.Bind(jwtConfiguration.Section, jwtConfiguration);
+
             //var secretKey = Environment.GetEnvironmentVariable("SECRET");
             var secretKey = configuration.GetSection("JwtSecters:JwtSecters").Value;
             services.AddAuthentication(opt => 
@@ -186,12 +190,21 @@ namespace StandardWebApiTemplate.Extensions
                     ValidateIssuer = true, 
                     ValidateAudience = true, 
                     ValidateLifetime = true, 
-                    ValidateIssuerSigningKey = true, 
-                    ValidIssuer = jwtSettings["validIssuer"], 
-                    ValidAudience = jwtSettings["validAudience"], 
+                    ValidateIssuerSigningKey = true,
+                    //ValidIssuer = jwtSettings["validIssuer"], as we used configuration binding we can use the below lines instead of these two lines
+                    //ValidAudience = jwtSettings["validAudience"], 
+                    ValidIssuer = jwtConfiguration.ValidIssuer,
+                    ValidAudience = jwtConfiguration.ValidAudience,
+
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)) 
                 }; 
             }); 
+        }
+
+        //Adding IOption for Configurations
+        public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<JwtConfiguration>(configuration.GetSection("JwtSettings"));
         }
 
     }
