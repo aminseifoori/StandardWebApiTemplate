@@ -15,6 +15,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Domain.ConfigurationModels;
+using Microsoft.OpenApi.Models;
+using StandardWebApiTemplate.Presentation.Controllers;
 
 namespace StandardWebApiTemplate.Extensions
 {
@@ -65,10 +67,10 @@ namespace StandardWebApiTemplate.Extensions
             });
         }
         //Define new Media Type - HATEOAS & APIRoot
-        public static void AddCustomMediaTypes(this IServiceCollection services) 
-        { 
-            services.Configure<MvcOptions>(config => 
-                { 
+        public static void AddCustomMediaTypes(this IServiceCollection services)
+        {
+            services.Configure<MvcOptions>(config =>
+                {
                     var systemTextJsonOutputFormatter = config.OutputFormatters.OfType<SystemTextJsonOutputFormatter>()?.FirstOrDefault();
                     if (systemTextJsonOutputFormatter != null)
                     {
@@ -77,21 +79,27 @@ namespace StandardWebApiTemplate.Extensions
                     }
                     var xmlOutputFormatter = config.OutputFormatters.OfType<XmlDataContractSerializerOutputFormatter>()?.FirstOrDefault();
                     if (xmlOutputFormatter != null)
-                    { 
+                    {
                         xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.codemaze.hateoas+xml");
                         xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.codemaze.apiroot+xml");
-                    } 
-                }); 
+                    }
+                });
         }
         //Adding Versioning Ability to API (needs Microsoft.AspNetCore.Mvc.Versioning nuget package)
-        public static void ConfigureVersioning(this IServiceCollection services) 
-        { 
-            services.AddApiVersioning(opt => 
-                { 
+        public static void ConfigureVersioning(this IServiceCollection services)
+        {
+            services.AddApiVersioning(opt =>
+                {
                     opt.ReportApiVersions = true;
-                    opt.AssumeDefaultVersionWhenUnspecified = true; 
+                    opt.AssumeDefaultVersionWhenUnspecified = true;
                     opt.DefaultApiVersion = new ApiVersion(1, 0);
-                    //opt.ApiVersionReader = new HeaderApiVersionReader("api-version"); we can add versioning through header
+                    opt.ApiVersionReader = new HeaderApiVersionReader("api-version"); //we can add versioning through header
+                    opt.Conventions.Controller<MoviesController>()
+                                .HasApiVersion(new ApiVersion(1, 0));
+                    opt.Conventions.Controller<MoviesV2Controller>()
+                                    .HasApiVersion(new ApiVersion(2, 0));
+                    //opt.Conventions.Controller<MoviesV2Controller>()
+                    //    .HasDeprecatedApiVersion(new ApiVersion(2, 0));
                 });
         }
 
@@ -111,9 +119,9 @@ namespace StandardWebApiTemplate.Extensions
         }
 
         //Rate Limiting & Throttling
-        public static void ConfigureRateLimitingOptions(this IServiceCollection services) 
-        { 
-            services.AddRateLimiter(opt => 
+        public static void ConfigureRateLimitingOptions(this IServiceCollection services)
+        {
+            services.AddRateLimiter(opt =>
                 {
                     //Set Global Limiter
                     opt.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>
@@ -158,15 +166,15 @@ namespace StandardWebApiTemplate.Extensions
         //Authentication With ASP.NET Core Identity
         public static void ConfigureIdentity(this IServiceCollection services)
         {
-            var builder = services.AddIdentity<User, IdentityRole>(option => 
-                { 
+            var builder = services.AddIdentity<User, IdentityRole>(option =>
+                {
                     option.Password.RequireDigit = true;
                     option.Password.RequireLowercase = false;
-                    option.Password.RequireUppercase = false; 
-                    option.Password.RequireNonAlphanumeric = false; 
-                    option.Password.RequiredLength = 6; 
+                    option.Password.RequireUppercase = false;
+                    option.Password.RequireNonAlphanumeric = false;
+                    option.Password.RequiredLength = 6;
                     option.User.RequireUniqueEmail = true;
-                }).AddEntityFrameworkStores<RepositoryContext>().AddDefaultTokenProviders(); 
+                }).AddEntityFrameworkStores<RepositoryContext>().AddDefaultTokenProviders();
         }
 
         //Add JWT
@@ -179,26 +187,26 @@ namespace StandardWebApiTemplate.Extensions
 
             //var secretKey = Environment.GetEnvironmentVariable("SECRET");
             var secretKey = configuration.GetSection("JwtSecters:JwtSecters").Value;
-            services.AddAuthentication(opt => 
-            { 
-                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; 
-                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
-            }).AddJwtBearer(options => 
-            { 
-                options.TokenValidationParameters = new TokenValidationParameters 
-                { 
-                    ValidateIssuer = true, 
-                    ValidateAudience = true, 
-                    ValidateLifetime = true, 
+            services.AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     //ValidIssuer = jwtSettings["validIssuer"], as we used configuration binding we can use the below lines instead of these two lines
                     //ValidAudience = jwtSettings["validAudience"], 
                     ValidIssuer = jwtConfiguration.ValidIssuer,
                     ValidAudience = jwtConfiguration.ValidAudience,
 
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)) 
-                }; 
-            }); 
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                };
+            });
         }
 
         //Adding IOption for Configurations
@@ -207,5 +215,53 @@ namespace StandardWebApiTemplate.Extensions
             services.Configure<JwtConfiguration>(configuration.GetSection("JwtSettings"));
         }
 
+        //Configure Swagger
+        public static void ConfigureSwagger(this IServiceCollection services) 
+        { 
+            services.AddSwaggerGen(s => 
+            { 
+                s.SwaggerDoc("v1", new OpenApiInfo 
+                { 
+                    Title = "Standard Web Api Template",
+                    Version = "v1",
+                    Description = "Movie API by Amin",
+                    TermsOfService = new Uri("https://example.com/terms"),
+                    Contact = new OpenApiContact 
+                        { 
+                            Name = "Amin Seifoori",
+                            Email = "amin.seifoori@gmail.com"
+                        },
+                    License = new OpenApiLicense 
+                        { 
+                            Name = "Movie API", 
+                            Url = new Uri("https://example.com/license"),
+                        }
+                });
+                s.SwaggerDoc("v2", new OpenApiInfo { Title = "Standard Web Api Template", Version = "v2" });
+                s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme 
+                { 
+                    In = ParameterLocation.Header,
+                    Description = "Place to add JWT with Bearer",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer" 
+                });
+                s.AddSecurityRequirement(new OpenApiSecurityRequirement() 
+                { 
+                    { 
+                        new OpenApiSecurityScheme 
+                        { 
+                            Reference = new OpenApiReference 
+                            { 
+                                Type = ReferenceType.SecurityScheme, 
+                                Id = "Bearer"
+                            }, 
+                            Name = "Bearer", 
+                        }, 
+                        new List<string>() 
+                    } 
+                });
+            }); 
+        }
     }
 }

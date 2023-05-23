@@ -20,7 +20,7 @@ builder.Services.ConfigureCors();
 //Add Output Cache (.NET 7)
 //builder.Services.ConfigureOutputCaching();
 //Add Rate Limiting
-builder.Services.ConfigureRateLimitingOptions();
+//builder.Services.ConfigureRateLimitingOptions();
 
 //Add Authentication Services
 builder.Services.AddAuthentication();
@@ -29,6 +29,9 @@ builder.Services.ConfigureIdentity();
 builder.Services.ConfigureJWT(builder.Configuration);
 //Adding IOption Configuration setting
 builder.Services.AddJwtConfiguration(builder.Configuration);
+
+//Add Swager service
+builder.Services.ConfigureSwagger();
 
 builder.Services.ConfigureIISIntegration();
 builder.Services.ConfigureLoggerManager();
@@ -93,8 +96,18 @@ app.UseCors("CorsPolicy");
 //Add Output Cache
 //app.UseOutputCache();
 
+
+
+
 app.UseAuthentication();
 app.UseAuthorization();
+//Add swagger Middleware
+app.UseSwagger();
+app.UseSwaggerUI(s =>
+{
+    s.SwaggerEndpoint("/swagger/v1/swagger.json", "Standard Web Api Templat v1");
+    s.SwaggerEndpoint("/swagger/v2/swagger.json", "Standard Web Api Templat v2");
+});
 
 app.MapControllers();
 

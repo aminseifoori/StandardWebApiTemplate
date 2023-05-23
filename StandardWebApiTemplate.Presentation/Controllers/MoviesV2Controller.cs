@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 
 namespace StandardWebApiTemplate.Presentation.Controllers
 {
-    [ApiVersion("2.0")]
+    //[ApiVersion("2.0")]
     [Route("api/movies")]
-    //[Route("api/{v:apiversion}/movies")] we can do versioning with routing
+    //[Route("api/{v:apiversion}/movies")] //we can do versioning with routing
     [ApiController]
+    [ApiExplorerSettings(GroupName = "v2")]
     public class MoviesV2Controller : ControllerBase
     {
         private readonly IServiceManager service;

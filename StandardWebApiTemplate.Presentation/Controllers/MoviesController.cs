@@ -17,6 +17,7 @@ namespace StandardWebApiTemplate.Presentation.Controllers
 {
     [Route("api/movies")]
     [ApiController]
+    [ApiExplorerSettings(GroupName = "v1")]
     public class MoviesController : ControllerBase
     {
         private readonly IServiceManager service;
